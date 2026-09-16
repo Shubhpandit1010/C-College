@@ -4,24 +4,17 @@ int main()
 
 {
     int n1,n2;
-    printf("\nEnter Two Nos. (1st should be strictly greater than 2nd):-> ");
+    printf("\nEnter Two Nos.: ");
     scanf("%d %d", &n1,&n2);
 
     int r;
-    if(n2>n1)
+    while(n2!=0)
     {
-        printf("\nERROR..");
-        return 0;
+        r=n1%n2;
+        n1=n2;
+        n2=r;
     }
-    else
-    {
-        while(n2!=0)
-        {
-            r=n1%n2;
-            n1=n2;
-            n2=r;
-        }
-    }
-    printf("\nGCD:-> %d", n1);
+
+    printf("\nGCD: %d", n1);
     return 0;
 }
