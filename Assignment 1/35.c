@@ -32,16 +32,14 @@ int main()
 
 {
     int n;
-    printf("\nEnter N:-> ");
+    printf("\nEnter Number:-> ");
     scanf("%d", &n);
-    int sum=n;
     int temp;
-    while(digits(sum)!=1)
+    temp=sumofdigits(n);
+    while(digits(temp)!=1)
     {
-        sum=sumofdigits(sum);
-        temp=sum;
-        sum=sumofdigits(temp);
+        temp=sumofdigits(temp);
     }
-    printf("\nDIGITAL ROOT:-> %d", sum);
+    printf("\nDIGITAL ROOT:-> %d", temp);
     return 0;
 }
