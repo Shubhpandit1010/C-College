@@ -6,14 +6,9 @@ int main()
     char c;
     printf("\nEnter Character:-> ");
     scanf("%c", &c);
+
     int ascii=c;
-    if(ascii>=97 && ascii<=123)
-    {
-        printf("\nSMALL CASE CHARACTER...");
-    }
-    else
-    {
-        printf("\nNOT SMALL CASE CHARACTER..");
-    }
+
+    (ascii>=97 && ascii<=123) ? printf("\nSMALL CASE LETTER") : printf("\nUPPER CASE LETTER");
     return 0;
 }

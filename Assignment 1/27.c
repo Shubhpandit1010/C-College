@@ -6,7 +6,7 @@ int main()
     int n;
     printf("\nEnter No.:-> ");
     scanf("%d", &n);
-
+    
     for(int i=2;i<n;i++)
     {
         if(n%i==0)

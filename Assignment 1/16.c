@@ -4,20 +4,31 @@ int main()
 
 {
     int a,b,c;
-    printf("\nEnter Three Nos.:-> ");
+    printf("\nEnter a,b,c respectively:-> ");
     scanf("%d %d %d", &a,&b,&c);
 
-    if(a>b && a>c)
+    if(a>b)
     {
-        printf("\nA is max..");
-    }
-    else if(b>a && b>c)
-    {
-        printf("\nB is max..");
+        if(a>c)
+        {
+            printf("\nA (%d) is max.", a);
+        }
+        else
+        {
+            printf("\nC (%d) is max.", c);
+        }
     }
     else
     {
-        printf("\nC is max...");
+        if(b>c)
+        {
+            printf("\nB (%d) is max.", b);
+        }
+        else
+        {
+            printf("\nC (%d) is max.", c);
+        }
     }
+
     return 0;
 }

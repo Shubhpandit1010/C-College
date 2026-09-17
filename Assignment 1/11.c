@@ -4,14 +4,34 @@ int main()
 
 {
     long totalsec;
-    int days,hr,min,sec;
-    printf("\nEnter Total Seconds:-> ");
+    int days,hours,mins,sec,temp;
+
+    printf("\nEnter TotalSeconds:-> ");
     scanf("%ld", &totalsec);
 
-    days=totalsec/(24*3600);
-    hr=(totalsec%86400)/3600;
-    min=(totalsec%3600)/60;
-    sec=totalsec%60;
-    printf("\nDAYS: %d\nHours: %d\nMINUTES: %d\nSECONDS: %d", days,hr,min,sec);
+    days=totalsec/(24*60*60);
+    temp=totalsec%(24*60*60);
+    hours=temp/(60*60);
+    temp=temp%(60*60);
+    mins=temp/60;
+    temp=temp%60;
+    sec=temp;
+
+    if(days!=0)
+    {
+        printf("\n(%d Days)", days);
+    }
+    if(hours!=0)
+    {
+        printf("(%d Hours)", hours);
+    }
+    if(mins!=0)
+    {
+        printf("(%d Minutes)", mins);
+    }
+    if(sec!=0)
+    {
+        printf("(%d Seconds)", sec);
+    }
     return 0;
 }

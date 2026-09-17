@@ -3,9 +3,10 @@
 int main()
 
 {
-    int salary;
+    int salary,grosssalary;
     printf("\nEnter One Month Salary:-> ");
     scanf("%d", &salary);
-    printf("\nGROSS PAY:-> %d", salary*12);
+    grosssalary=salary*12;
+    printf("\nGROSS PAY:-> %d", grosssalary);
     return 0;
 }
