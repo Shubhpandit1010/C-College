@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PDF to PPTX 1:1 Converter</title>
+
+  <!-- External CDNs: PDF.js & PptxGenJS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    body {
+      background-color: #0f172a;
+      color: #f8fafc;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .converter-card {
+      background-color: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      max-width: 520px;
+      width: 100%;
+      padding: 32px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+    }
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      text-align: center;
+    }
+    p.subtitle {
+      color: #94a3b8;
+      font-size: 0.875rem;
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    label {
+      font-size: 0.75rem;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 600;
+    }
+    select {
+      background-color: #0f172a;
+      color: #f8fafc;
+      border: 1px solid #334155;
+      padding: 10px 12px;
+      border-radius: 8px;
+      outline: none;
+      font-size: 0.875rem;
+    }
+    select:focus {
+      border-color: #38bdf8;
+    }
+    .dropzone {
+      border: 2px dashed #475569;
+      border-radius: 10px;
+      padding: 32px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: #0f172a80;
+      margin-bottom: 20px;
+    }
+    .dropzone:hover, .dropzone.dragover {
+      border-color: #38bdf8;
+      background: #1e293b;
+    }
+    .dropzone input {
+      display: none;
+    }
+    .file-name {
+      font-size: 0.875rem;
+      color: #38bdf8;
+      margin-top: 8px;
+      word-break: break-all;
+    }
+    .btn {
+      width: 100%;
+      background-color: #0284c7;
+      color: #ffffff;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    .btn:hover:not(:disabled) {
+      background-color: #0369a1;
+    }
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .progress-container {
+      margin-top: 20px;
+      display: none;
+    }
+    .progress-bar-bg {
+      width: 100%;
+      height: 8px;
+      background-color: #334155;
+      border-radius: 9999px;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background-color: #38bdf8;
+      transition: width 0.15s ease;
+    }
+    .status-text {
+      font-size: 0.8rem;
+      color: #94a3b8;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="converter-card">
+    <h1>PDF to PPTX Converter</h1>
+    <p class="subtitle">Pixel-perfect 1:1 slide rendering engine</p>
+
+    <div class="options-grid">
+      <div class="form-group">
+        <label for="dpiSelect">Target Resolution</label>
+        <select id="dpiSelect">
+          <option value="150">150 DPI (Mobile/Fast)</option>
+          <option value="200" selected>200 DPI (Balanced)</option>
+          <option value="300">300 DPI (Max Detail)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="formatSelect">Compression</label>
+        <select id="formatSelect">
+          <option value="jpeg" selected>JPEG (Low RAM)</option>
+          <option value="png">PNG (Lossless)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="dropzone" id="dropzone">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 8px;">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+        <polyline points="14 2 14 8 20 8"></polyline>
+        <line x1="12" y1="18" x2="12" y2="12"></line>
+        <line x1="9" y1="15" x2="15" y2="15"></line>
+      </svg>
+      <div>Drop your PDF here or <strong>browse</strong></div>
+      <div class="file-name" id="fileNameDisplay"></div>
+      <input type="file" id="fileInput" accept="application/pdf" />
+    </div>
+
+    <button class="btn" id="convertBtn" disabled>Convert & Download PPTX</button>
+
+    <div class="progress-container" id="progressContainer">
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progressBar"></div>
+      </div>
+      <div class="status-text" id="statusText">Ready</div>
+    </div>
+  </div>
+
+  <script>
+    // Configure PDF.js worker
+    pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+    const dropzone = document.getElementById("dropzone");
+    const fileInput = document.getElementById("fileInput");
+    const convertBtn = document.getElementById("convertBtn");
+    const fileNameDisplay = document.getElementById("fileNameDisplay");
+    const progressContainer = document.getElementById("progressContainer");
+    const progressBar = document.getElementById("progressBar");
+    const statusText = document.getElementById("statusText");
+    const dpiSelect = document.getElementById("dpiSelect");
+    const formatSelect = document.getElementById("formatSelect");
+
+    let currentFile = null;
+
+    dropzone.addEventListener("click", () => fileInput.click());
+
+    dropzone.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      dropzone.classList.add("dragover");
+    });
+
+    dropzone.addEventListener("dragleave", () => {
+      dropzone.classList.remove("dragover");
+    });
+
+    dropzone.addEventListener("drop", (e) => {
+      e.preventDefault();
+      dropzone.classList.remove("dragover");
+      if (e.dataTransfer.files.length > 0) {
+        handleFileSelection(e.dataTransfer.files[0]);
+      }
+    });
+
+    fileInput.addEventListener("change", (e) => {
+      if (e.target.files.length > 0) {
+        handleFileSelection(e.target.files[0]);
+      }
+    });
+
+    function handleFileSelection(file) {
+      if (file.type !== "application/pdf") {
+        alert("Please upload a valid PDF document.");
+        return;
+      }
+      currentFile = file;
+      fileNameDisplay.textContent = file.name;
+      convertBtn.disabled = false;
+    }
+
+    convertBtn.addEventListener("click", async () => {
+      if (!currentFile) return;
+
+      convertBtn.disabled = true;
+      progressContainer.style.display = "block";
+      statusText.textContent = "Loading document...";
+      progressBar.style.width = "0%";
+
+      try {
+        const arrayBuffer = await currentFile.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        const totalPages = pdf.numPages;
+
+        const pptx = new PptxGenJS();
+        const targetDpi = parseInt(dpiSelect.value, 10);
+        const format = formatSelect.value;
+        const scale = targetDpi / 72; // Standard PDF point density is 72 pt/in
+
+        // Single reusable canvas to avoid allocating memory repeatedly
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d", { willReadFrequently: true });
+
+        for (let i = 1; i <= totalPages; i++) {
+          statusText.textContent = `Rendering page ${i} of ${totalPages}...`;
+          progressBar.style.width = `${Math.round(((i - 1) / totalPages) * 100)}%`;
+
+          const page = await pdf.getPage(i);
+          const viewport = page.getViewport({ scale });
+
+          // Calculate exact dimensions in inches
+          const slideWidthInches = viewport.width / targetDpi;
+          const slideHeightInches = viewport.height / targetDpi;
+
+          // Define slide size dynamically per presentation layout
+          pptx.defineLayout({
+            name: `LAYOUT_${i}`,
+            width: slideWidthInches,
+            height: slideHeightInches,
+          });
+
+          const slide = pptx.addSlide();
+          slide.layout = `LAYOUT_${i}`;
+
+          // Prepare canvas dimensions
+          canvas.width = viewport.width;
+          canvas.height = viewport.height;
+
+          // Render PDF frame into canvas
+          await page.render({
+            canvasContext: ctx,
+            viewport: viewport,
+          }).promise;
+
+          // Encode image buffer
+          let imgData;
+          if (format === "jpeg") {
+            imgData = canvas.toDataURL("image/jpeg", 0.9);
+          } else {
+            imgData = canvas.toDataURL("image/png");
+          }
+
+          // Pin image to full slide width and height
+          slide.addImage({
+            data: imgData,
+            x: 0,
+            y: 0,
+            w: "100%",
+            h: "100%",
+          });
+
+          // Free canvas resources between cycles
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          canvas.width = 0;
+          canvas.height = 0;
+        }
+
+        statusText.textContent = "Building PPTX file...";
+        progressBar.style.width = "95%";
+
+        const baseFileName = currentFile.name.replace(/\.[^/.]+$/, "");
+        await pptx.writeFile({ fileName: `${baseFileName}.pptx` });
+
+        progressBar.style.width = "100%";
+        statusText.textContent = "Done! Download complete.";
+      } catch (err) {
+        console.error(err);
+        alert("An error occurred during conversion: " + err.message);
+        statusText.textContent = "Conversion failed.";
+      } finally {
+        convertBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
